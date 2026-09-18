@@ -1,57 +1,22 @@
-function App() {
-  return (
-    <div className="brand-page">
-      <div className="brand-card">
-        <div className="brand-figure" aria-label="Logo da Indómita">
-          <svg viewBox="0 0 680 680" role="img" aria-hidden="true">
-            <circle cx="340" cy="330" r="240" className="brand-ring" />
-            <path d="M287 140c-40 16-72 46-98 92-36 62-34 127-12 171 23 46 72 76 126 82 56 7 118-15 158-71 40-56 55-140 26-209-26-63-86-104-160-115-19-3-31-2-40 0Z" className="brand-silhouette" fill="none" stroke="currentColor" strokeWidth="3.8" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M360 198c-24-28-68-38-100-24-20 9-41 30-40 56 1 32 28 48 49 54 18 5 42 4 61-5 16-9 36-24 38-49 2-15-1-25-8-32Z" className="brand-silhouette" fill="none" stroke="currentColor" strokeWidth="3.8" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M298 244c-22 15-38 38-51 64m81-38c6 15 13 38 20 61m-112 37c14 19 28 32 53 42m47-18c6 27 17 51 36 69" className="brand-silhouette" fill="none" stroke="currentColor" strokeWidth="3.8" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M465 174c32 0 50 30 44 64-13 11-26 16-42 19-17 3-33-2-41-17 0-23 17-57 39-66Z" className="brand-accent" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M485 200c20 0 36 18 33 40-19 5-33 7-46 1-7-3-11-9-12-19 1-13 10-22 25-22Z" className="brand-accent" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M490 410c32-34 58-64 95-84" className="brand-silhouette" fill="none" stroke="currentColor" strokeWidth="3.8" strokeLinecap="round" />
-            <path d="M498 448c29-18 46-32 69-58" className="brand-silhouette" fill="none" stroke="currentColor" strokeWidth="3.8" strokeLinecap="round" />
-          </svg>
-        </div>
+﻿import { useEffect, useState } from 'react'
+import { supabase } from './lib/supabase'
+import './App.css'
 
-        <h1 className="brand-name">INDÓMITA</h1>
-        <div className="brand-tagline">FORTE • LIVRE • IMPARÁVEL</div>
+type Product = { id: string; name: string; description: string | null; category_name: string | null; price_cents: number; image_url: string | null }
+const price = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(value / 100)
 
-        <div className="contact-row">
-          <div className="contact-tile">
-            <div className="icon-badge" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Zm0-8.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z" /></svg>
-            </div>
-            <div className="label">ENDEREÇO</div>
-            <p>Rua General Marques, 483.<br />Sala 2 – Centro<br />São Borja – RS</p>
-          </div>
-
-          <div className="divider" aria-hidden="true" />
-
-          <div className="contact-tile">
-            <div className="icon-badge" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h1.1c.7 0 1.3.4 1.6 1l.7 1.8a1.8 1.8 0 0 1-.5 2L10 8.4c.8 1.6 2.2 3 3.8 3.8l1.6-1.4a1.8 1.8 0 0 1 2-.5l1.8.7c.6.3 1 1 1 1.6v1.1A2.5 2.5 0 0 1 19.5 18h-1.1A14.4 14.4 0 0 1 4 6.6V5.5Z" /></svg>
-            </div>
-            <div className="label">TELEFONE</div>
-            <p>(21) 98506-7171<br />(51) 99131-6559</p>
-          </div>
-
-          <div className="divider" aria-hidden="true" />
-
-          <div className="contact-tile">
-            <div className="icon-badge" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M7 2.5A4.5 4.5 0 0 0 2.5 7v10A4.5 4.5 0 0 0 7 21.5h10A4.5 4.5 0 0 0 21.5 17V7A4.5 4.5 0 0 0 17 2.5H7Zm0 3.5h10a1 1 0 0 1 1 1v8.5a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Zm9.5 2.5a.8.8 0 0 1 .8.8v.5a.8.8 0 0 1-1.6 0v-.5a.8.8 0 0 1 .8-.8ZM12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z" /></svg>
-            </div>
-            <div className="label">INSTAGRAM</div>
-            <p>@vestir.indomita</p>
-          </div>
-        </div>
-
-        <div className="brand-footer">MODA FITNESS QUE ACOMPANHA A SUA ESSÊNCIA</div>
-      </div>
-    </div>
-  )
+export default function App() {
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  useEffect(() => { void (async () => { if (supabase) { const { data } = await supabase.from('public_product_catalog').select('*').order('name'); setProducts((data ?? []) as Product[]) }; setLoading(false) })() }, [])
+  const items = products.length ? products.slice(0, 4) : Array.from({ length: 4 }, (_, i) => ({ id: `blank-${i}`, name: 'Nova peÃ§a', description: 'Em breve', category_name: 'IndÃ³mita', price_cents: 0, image_url: null }))
+  return <main>
+    <div className="announcement">FRETE GRÃTIS EM COMPRAS ACIMA DE R$ 299 <i>â€¢</i> DROP 01 CHEGANDO</div>
+    <header><a className="logo" href="#inicio">indÃ³mita<sup>Â®</sup></a><nav><a href="#colecao">novidades</a><a href="#colecao">coleÃ§Ã£o</a><a href="#manifesto">manifesto</a></nav><div className="tools">âŒ• <button aria-label="Sacola">â™§<b>0</b></button></div></header>
+    <section id="inicio" className="hero"><div className="hero-text"><p className="eyebrow">DROP 01 / 2026</p><h1>feita para<br />ir <em>alÃ©m.</em></h1><p className="hero-description">Movimento, potÃªncia e presenÃ§a. Moda fitness que acompanha a sua essÃªncia.</p><a className="button dark" href="#colecao">explorar a coleÃ§Ã£o <span>â†—</span></a></div><div className="campaign"><div className="ring one"/><div className="ring two"/><p>IMAGEM DA<br/>CAMPANHA<br/><small>EM BREVE</small></p><label>INDÃ“MITA<br/>MOVIMENTO 01</label></div></section>
+    <section className="introduction"><p className="eyebrow">A INDÃ“MITA</p><h2>NÃ£o Ã© sÃ³ sobre vestir.<br/><em>Ã‰ sobre chegar inteira.</em></h2><p>PeÃ§as que respeitam o seu ritmo, desenhadas para mulheres que nÃ£o pedem licenÃ§a para ocupar espaÃ§o.</p></section>
+    <section id="colecao" className="collection"><div className="heading"><div><p className="eyebrow">SELEÃ‡ÃƒO ATUAL</p><h2>peÃ§as em <em>movimento</em></h2></div><span>{products.length ? `${String(products.length).padStart(2, '0')} peÃ§as` : 'em construÃ§Ã£o'}</span></div><div className="grid">{loading ? <p>Carregando coleÃ§Ã£o...</p> : items.map((item, i) => <article key={item.id}><div className="photo">{item.image_url ? <img src={item.image_url} alt={item.name}/> : <div className="blank"><span>0{i + 1}</span><p>espaÃ§o para<br/>sua peÃ§a</p></div>}<b>{item.category_name ?? 'INDÃ“MITA'}</b></div><div className="product"><div><h3>{item.name}</h3><p>{item.description || 'Novo essencial IndÃ³mita'}</p></div>{item.price_cents > 0 && <strong>{price(item.price_cents)}</strong>}</div></article>)}</div><a className="button outline" href="#colecao">ver todas as peÃ§as <span>â†—</span></a></section>
+    <section id="manifesto" className="manifesto"><p className="eyebrow">NOSSO MANIFESTO</p><h2>corpo livre.<br/><em>mente indÃ´mita.</em></h2><p>Seu treino Ã© seu territÃ³rio. Sua roupa tambÃ©m.</p></section>
+    <footer><a className="logo" href="#inicio">indÃ³mita<sup>Â®</sup></a><p>MODA FITNESS PARA QUEM SE MOVE COM PROPÃ“SITO</p><a href="https://instagram.com" target="_blank" rel="noreferrer">instagram â†—</a></footer>
+  </main>
 }
-
-export default App
