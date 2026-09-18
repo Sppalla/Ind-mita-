@@ -1,0 +1,10 @@
+# Vercel / environment
+.vercel
+.env*
+
+# Node / build artifacts
+node_modules/
+dist/
+.vite/
+*.log
+.DS_Store
