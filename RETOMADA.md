@@ -24,7 +24,7 @@ Portanto, a função pública não herda o RLS do visitante: sua segurança depe
 
 ## Aplicação no Supabase
 
-Nenhuma alteração foi aplicada ao banco remoto e nenhum deploy foi feito nesta retomada.
+Atualização de publicação — 19/09/2026: migrations 005 e 006 aplicadas juntas, em transação, no projeto `pdwjfunozmlgznqsqakl` (PostgreSQL 17.6). Commit de implementação `ca34a54` enviado à main e publicado nos dois projetos Vercel. As instruções abaixo permanecem como referência para outras instalações; não é necessário reaplicá-las neste projeto.
 
 Para um banco que já recebeu 001–004, aplicar no SQL Editor, nesta ordem:
 
@@ -55,8 +55,16 @@ npm --prefix indomita-loja run lint
 
 O teste em PGlite não valida o ambiente remoto, Supabase Auth real, Storage ou PostgREST. A extensão pgcrypto é omitida somente no teste local; o gerador UUID nativo do PostgreSQL permanece disponível.
 
-## Pendente no ambiente real
+## Verificação em produção
 
 A automação de navegador foi bloqueada por `helper_sandbox_lock_failed` no ambiente de execução. Não foi possível validar a interface interativamente nem efetuar o cadastro cruzado painel → loja real.
 
-Depois das migrations e do deploy: entrar como equipe, criar peça simples com foto, verificar a loja, converter para variantes reais, zerar estoque, testar rascunho e testar banner com vigência. Confirmar upload no Storage e o favicon na aba real do navegador. O acesso ao banco remoto é necessário para concluir essa etapa.
+- Teste transacional no banco remoto aprovado: cadastro como equipe, registro de imagem, conversão de variante-base, rollback de erro, acesso anônimo e isolamento de rascunhos. Todos os dados de teste foram revertidos.
+- API pública via PostgREST aprovada: catálogo, variantes e bloqueio de linhas privadas.
+- Loja publicada: https://indomita-five.vercel.app
+- Painel publicado: https://indomita-painel.vercel.app
+- Ambos os deploys em estado READY; HTTP 200 para HTML, JavaScript e favicon. Confirmadas as funções novas nos bundles e o endereço correto do Supabase.
+- Corrigidos na Vercel: raiz do painel para `indomita-painel` e variáveis `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` de produção da loja.
+- O banco estava sem produtos no momento da publicação; o catálogo vazio é o estado esperado.
+
+Permanece sem validação interativa: login no navegador, upload real no Storage e contraste do favicon na aba do navegador. A imagem foi revisada em fundos claro e escuro; os testes remotos não substituem essa inspeção de interface.
