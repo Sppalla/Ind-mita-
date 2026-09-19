@@ -1,3 +1,931 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Work+Sans:wght@400;500;600&display=swap');
-@tailwind base;@tailwind components;@tailwind utilities;
-:root{--cream:#FAF0E6;--blush:#E6D0BD;--gold:#CDA06B;--brown:#45392D}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-width:320px;background:var(--cream);color:var(--brown);font-family:'Work Sans',sans-serif;font-weight:400}a{color:inherit;text-decoration:none}.site-header{height:96px;padding:0 7vw;display:flex;align-items:center;justify-content:space-between}.logo{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:33px;letter-spacing:.015em}.logo sup{font:10px 'Work Sans',sans-serif;vertical-align:top;margin-left:2px}.site-header nav{display:flex;gap:36px;font-size:14px}.site-header nav a{padding:8px 0;border-bottom:1px solid transparent}.site-header nav a:hover{border-color:var(--gold)}.bag{border:0;background:none;color:var(--brown);font:14px 'Work Sans',sans-serif;cursor:pointer}.bag span{display:inline-grid;place-items:center;width:19px;height:19px;margin-left:5px;border-radius:50%;background:var(--blush);font-size:11px}.hero{min-height:610px;padding:70px 11vw 95px;position:relative;display:flex;align-items:center;overflow:hidden}.hero-copy{position:relative;z-index:1;max-width:760px}.hero h1,.welcome h2,.section-title h2,.manifesto h2{margin:0;font:500 clamp(53px,7vw,100px)/.9 'Cormorant Garamond',serif;letter-spacing:-.045em}.hero h1 em,.welcome h2 em,.manifesto h2 em{font-weight:500}.hero-copy>p{max-width:355px;margin:29px 0 34px;font-size:16px;line-height:1.65}.cta{display:inline-block;padding:15px 25px;border-radius:28px;background:var(--brown);color:var(--cream);font-size:14px;font-weight:500}.hero-art{position:absolute;right:1vw;top:22px;width:min(54vw,660px);color:var(--gold)}.hero-mark{display:block;width:100%;height:auto;opacity:.92}.welcome{padding:120px 11vw;background:var(--blush)}.welcome h2{font-size:clamp(44px,5vw,76px)}.welcome>p{max-width:380px;margin:25px 0 0;font-size:16px;line-height:1.65}.collection{padding:118px 7vw}.section-title{max-width:510px;margin-bottom:46px}.section-title h2{font-size:clamp(43px,5vw,70px)}.section-title p{margin:19px 0 0;font-size:15px;line-height:1.6}.products{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}.product-image{aspect-ratio:.76;border-radius:18px;overflow:hidden;background:var(--blush)}.product-image img{width:100%;height:100%;object-fit:cover}.placeholder{height:100%;padding:16px;display:flex;flex-direction:column;justify-content:space-between;color:var(--gold)}.placeholder span{align-self:flex-end;font-size:12px}.placeholder p{margin:0;font:500 18px/1.15 'Cormorant Garamond',serif}.product-info{min-height:74px;display:flex;justify-content:space-between;gap:10px;padding:14px 4px;border-bottom:1px solid var(--blush)}.product-info h3{font-size:14px;font-weight:500;margin:0 0 5px}.product-info p,.product-info strong{font-size:12px;font-weight:400;margin:0}.product-info strong{white-space:nowrap}.manifesto{padding:125px 11vw;background:var(--blush)}.manifesto h2{font-size:clamp(48px,6vw,86px)}.manifesto p{margin:25px 0 0;font-size:16px}footer{padding:38px 7vw;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--blush)}footer p,footer>a:last-child{font-size:13px}@media(max-width:720px){.site-header{height:78px;padding:0 24px}.site-header nav{display:none}.logo{font-size:28px}.hero{min-height:580px;padding:90px 29px}.hero-art{width:105vw;right:-45vw;top:78px;opacity:.34}.hero h1{font-size:60px}.hero-copy>p{font-size:14px}.welcome,.manifesto{padding:85px 29px}.collection{padding:82px 20px}.products{grid-template-columns:repeat(2,1fr);gap:14px}.product-info{min-height:67px}.placeholder p{font-size:16px}footer{padding:30px 24px;align-items:flex-start;gap:20px}footer p{max-width:130px;font-size:11px}}
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Work+Sans:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --cream: #FAF0E6;
+  --blush: #E6D0BD;
+  --gold: #CDA06B;
+  --gold-light: #DFBF94;
+  --gold-glow: rgba(205, 160, 107, 0.28);
+  --brown: #45392D;
+  --brown-dark: #2F261E;
+  --brown-soft: rgba(69, 57, 45, 0.72);
+  --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--cream);
+  color: var(--brown);
+  font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Header & Navegação
+   ========================================================================== */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: 92px;
+  padding: 0 7vw;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(250, 240, 230, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(230, 208, 189, 0.5);
+  transition: var(--transition-smooth);
+}
+
+.logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 33px;
+  letter-spacing: 0.02em;
+  color: var(--brown);
+  transition: opacity 0.2s ease;
+}
+
+.logo:hover {
+  opacity: 0.85;
+}
+
+.logo sup {
+  font: 10px 'Work Sans', sans-serif;
+  vertical-align: top;
+  margin-left: 2px;
+  color: var(--gold);
+}
+
+.site-header nav {
+  display: flex;
+  gap: 36px;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+}
+
+.site-header nav a {
+  position: relative;
+  padding: 8px 0;
+  color: var(--brown);
+  transition: color 0.25s ease;
+}
+
+.site-header nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1.5px;
+  background: var(--gold);
+  transition: width 0.3s var(--ease-out-expo);
+}
+
+.site-header nav a:hover {
+  color: var(--brown-dark);
+}
+
+.site-header nav a:hover::after {
+  width: 100%;
+}
+
+/* Botão da Sacola no Header */
+.bag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(230, 208, 189, 0.35);
+  border: 1px solid rgba(205, 160, 107, 0.25);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: var(--transition-smooth);
+}
+
+.bag:hover {
+  background: rgba(230, 208, 189, 0.6);
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+
+.bag span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 4px;
+  border-radius: 11px;
+  background: var(--brown);
+  color: var(--cream);
+  font-size: 11px;
+  font-weight: 600;
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.bag span.bump {
+  animation: badgePop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ==========================================================================
+   Hero Section & Animação Orgânica
+   ========================================================================== */
+.hero {
+  min-height: 620px;
+  padding: 80px 11vw 95px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: radial-gradient(circle at 80% 20%, rgba(230, 208, 189, 0.35) 0%, transparent 60%), var(--cream);
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+  animation: fadeInUp 0.9s var(--ease-out-expo) forwards;
+}
+
+.hero h1,
+.welcome h2,
+.section-title h2,
+.manifesto h2 {
+  margin: 0;
+  font: 500 clamp(52px, 7vw, 98px) / 0.92 'Cormorant Garamond', serif;
+  letter-spacing: -0.04em;
+  color: var(--brown);
+}
+
+.hero h1 em,
+.welcome h2 em,
+.manifesto h2 em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--gold);
+}
+
+.hero-copy > p {
+  max-width: 380px;
+  margin: 28px 0 36px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--brown-soft);
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 32px;
+  border-radius: 30px;
+  background: var(--brown);
+  color: var(--cream);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  box-shadow: 0 4px 18px rgba(69, 57, 45, 0.15);
+  transition: var(--transition-smooth);
+}
+
+.cta:hover {
+  background: var(--brown-dark);
+  box-shadow: 0 8px 24px var(--gold-glow);
+  transform: translateY(-2px);
+}
+
+.hero-art {
+  position: absolute;
+  right: 2vw;
+  top: 30px;
+  width: min(52vw, 640px);
+  pointer-events: none;
+}
+
+.hero-mark {
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0.94;
+  animation: gentleFloat 7s ease-in-out infinite;
+  filter: drop-shadow(0 15px 35px rgba(205, 160, 107, 0.2));
+}
+
+/* ==========================================================================
+   Welcome & Manifesto
+   ========================================================================== */
+.welcome {
+  padding: 110px 11vw;
+  background: var(--blush);
+  position: relative;
+}
+
+.welcome h2 {
+  font-size: clamp(42px, 5vw, 74px);
+}
+
+.welcome > p {
+  max-width: 420px;
+  margin: 24px 0 0;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--brown);
+}
+
+.manifesto {
+  padding: 120px 11vw;
+  background: var(--blush);
+}
+
+.manifesto h2 {
+  font-size: clamp(46px, 6vw, 84px);
+}
+
+.manifesto p {
+  max-width: 420px;
+  margin: 24px 0 0;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* ==========================================================================
+   Coleção & Cards com Hover Sofisticado
+   ========================================================================== */
+.collection {
+  padding: 110px 7vw;
+}
+
+.section-title {
+  max-width: 540px;
+  margin-bottom: 48px;
+}
+
+.section-title h2 {
+  font-size: clamp(40px, 5vw, 68px);
+}
+
+.section-title p {
+  margin: 16px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--brown-soft);
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.4s var(--ease-out-expo);
+}
+
+.product-image-container {
+  position: relative;
+  aspect-ratio: 0.76;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--blush);
+  box-shadow: 0 4px 16px rgba(69, 57, 45, 0.04);
+  transition: box-shadow 0.4s var(--ease-out-expo);
+}
+
+.product-card:hover .product-image-container {
+  box-shadow: 0 14px 32px rgba(69, 57, 45, 0.12);
+}
+
+.product-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.65s var(--ease-out-expo);
+}
+
+.product-card:hover .product-image-container img {
+  transform: scale(1.04);
+}
+
+.placeholder {
+  height: 100%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: var(--gold);
+}
+
+.placeholder span {
+  align-self: flex-end;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.placeholder p {
+  margin: 0;
+  font: 500 20px / 1.15 'Cormorant Garamond', serif;
+  color: var(--brown);
+}
+
+/* Botão de Adição Rápida flutuante no Card */
+.quick-add-btn {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  right: 14px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(250, 240, 230, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--brown);
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 6px 16px rgba(69, 57, 45, 0.12);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: var(--transition-smooth);
+}
+
+.quick-add-btn:hover {
+  background: var(--brown);
+  color: var(--cream);
+}
+
+.product-card:hover .quick-add-btn,
+.product-card:focus-within .quick-add-btn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.product-info {
+  min-height: 74px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 4px 6px;
+  border-bottom: 1px solid rgba(230, 208, 189, 0.8);
+}
+
+.product-info h3 {
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0 0 4px;
+  color: var(--brown);
+}
+
+.product-info p {
+  font-size: 13px;
+  color: var(--brown-soft);
+  margin: 0;
+}
+
+.product-info strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brown);
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   Gaveta da Sacola (Cart Drawer Component)
+   ========================================================================== */
+.cart-portal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cart-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(47, 38, 30, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.cart-drawer {
+  position: relative;
+  z-index: 1;
+  width: min(450px, 100vw);
+  height: 100vh;
+  background: var(--cream);
+  border-left: 1px solid var(--blush);
+  box-shadow: -10px 0 35px rgba(69, 57, 45, 0.18);
+  display: flex;
+  flex-direction: column;
+  animation: slideInRight 0.38s var(--ease-out-expo) forwards;
+}
+
+/* Cabeçalho da gaveta */
+.cart-header {
+  height: 84px;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--blush);
+}
+
+.cart-title-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.cart-title-wrap h2 {
+  margin: 0;
+  font: 600 28px 'Cormorant Garamond', serif;
+  color: var(--brown);
+}
+
+.cart-count-pill {
+  font-size: 12px;
+  color: var(--brown-soft);
+  text-transform: lowercase;
+}
+
+.cart-close-btn {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 24px;
+  color: var(--brown);
+  transition: var(--transition-smooth);
+}
+
+.cart-close-btn:hover {
+  background: var(--blush);
+  transform: rotate(90deg);
+}
+
+/* Corpo da gaveta */
+.cart-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 28px;
+}
+
+/* Estado Vazio */
+.cart-empty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 10px;
+}
+
+.empty-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--blush);
+  color: var(--gold);
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  margin-bottom: 20px;
+  animation: gentlePulse 3s infinite ease-in-out;
+}
+
+.cart-empty h3 {
+  margin: 0 0 10px;
+  font: 600 24px 'Cormorant Garamond', serif;
+  color: var(--brown);
+}
+
+.cart-empty p {
+  margin: 0 0 28px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--brown-soft);
+  max-width: 300px;
+}
+
+.cart-explore-btn {
+  padding: 13px 28px;
+  border-radius: 24px;
+  background: var(--brown);
+  color: var(--cream);
+  font-size: 13px;
+  font-weight: 500;
+  transition: var(--transition-smooth);
+}
+
+.cart-explore-btn:hover {
+  background: var(--brown-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px var(--gold-glow);
+}
+
+/* Lista de Itens */
+.cart-item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(230, 208, 189, 0.6);
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.cart-item-image {
+  aspect-ratio: 0.8;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--blush);
+}
+
+.cart-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cart-item-placeholder {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: var(--gold);
+}
+
+.cart-item-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cart-item-main h4 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--brown);
+}
+
+.cart-item-variant {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--brown-soft);
+}
+
+.cart-item-unit-price {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brown);
+}
+
+.cart-item-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.quantity-stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--blush);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.stepper-btn {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  color: var(--brown);
+  border-radius: 50%;
+  transition: background 0.18s ease;
+}
+
+.stepper-btn:hover {
+  background: var(--blush);
+}
+
+.stepper-value {
+  padding: 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brown);
+}
+
+.cart-item-remove {
+  font-size: 12px;
+  color: var(--brown-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.18s ease;
+}
+
+.cart-item-remove:hover {
+  color: #B54737;
+}
+
+/* Rodapé da Sacola */
+.cart-footer {
+  padding: 24px 28px;
+  border-top: 1px solid var(--blush);
+  background: rgba(250, 240, 230, 0.98);
+}
+
+.cart-subtotal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.cart-subtotal-row span {
+  color: var(--brown-soft);
+}
+
+.cart-subtotal-row strong {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--brown);
+}
+
+.cart-shipping-note {
+  margin: 0 0 18px;
+  font-size: 12px;
+  color: var(--brown-soft);
+}
+
+.cart-phase1-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(205, 160, 107, 0.15);
+  border: 1px solid rgba(205, 160, 107, 0.4);
+  margin-bottom: 16px;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.cart-phase1-notice span {
+  color: var(--gold);
+  font-size: 14px;
+}
+
+.cart-phase1-notice p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--brown);
+}
+
+.cart-checkout-btn {
+  width: 100%;
+  padding: 15px;
+  border-radius: 26px;
+  background: var(--brown);
+  color: var(--cream);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  box-shadow: 0 4px 18px rgba(69, 57, 45, 0.15);
+  transition: var(--transition-smooth);
+}
+
+.cart-checkout-btn:hover {
+  background: var(--brown-dark);
+  box-shadow: 0 8px 24px var(--gold-glow);
+  transform: translateY(-1px);
+}
+
+.cart-continue-btn {
+  width: 100%;
+  padding: 11px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--brown-soft);
+  text-align: center;
+  transition: color 0.2s ease;
+}
+
+.cart-continue-btn:hover {
+  color: var(--brown);
+}
+
+/* ==========================================================================
+   Footer da Loja
+   ========================================================================== */
+footer {
+  padding: 40px 7vw;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--blush);
+}
+
+footer p,
+footer > a:last-child {
+  font-size: 13px;
+  color: var(--brown-soft);
+  transition: color 0.2s ease;
+}
+
+footer > a:last-child:hover {
+  color: var(--gold);
+}
+
+/* ==========================================================================
+   Keyframes & Animações
+   ========================================================================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes gentleFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(0.8deg);
+  }
+}
+
+@keyframes gentlePulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(205, 160, 107, 0.4);
+  }
+  50% {
+    transform: scale(1.04);
+    box-shadow: 0 0 0 8px rgba(205, 160, 107, 0);
+  }
+}
+
+@keyframes badgePop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.35); background: var(--gold); }
+  100% { transform: scale(1); }
+}
+
+/* ==========================================================================
+   Responsividade
+   ========================================================================== */
+@media (max-width: 900px) {
+  .products {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+}
+
+@media (max-width: 720px) {
+  .site-header {
+    height: 78px;
+    padding: 0 24px;
+  }
+  .site-header nav {
+    display: none;
+  }
+  .logo {
+    font-size: 28px;
+  }
+  .hero {
+    min-height: 560px;
+    padding: 85px 24px;
+  }
+  .hero-art {
+    width: 105vw;
+    right: -45vw;
+    top: 75px;
+    opacity: 0.28;
+  }
+  .hero h1 {
+    font-size: 56px;
+  }
+  .hero-copy > p {
+    font-size: 15px;
+  }
+  .welcome,
+  .manifesto {
+    padding: 80px 24px;
+  }
+  .collection {
+    padding: 80px 20px;
+  }
+  .products {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .product-image-container {
+    border-radius: 16px;
+  }
+  .quick-add-btn {
+    opacity: 1;
+    transform: translateY(0);
+    padding: 8px;
+    font-size: 11px;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+  }
+  .product-info {
+    min-height: 64px;
+    padding: 12px 2px 4px;
+  }
+  .cart-drawer {
+    width: 100vw;
+  }
+  footer {
+    padding: 30px 24px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
+/* Redução de movimento acessível */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
