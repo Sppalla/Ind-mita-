@@ -29,7 +29,7 @@ export default function App() {
   const [productDraft, setProductDraft] = useState<ProductDraft | null>(null), [bannerDraft, setBannerDraft] = useState<BannerDraft | null>(null), [search, setSearch] = useState(''), [categoryFilter, setCategoryFilter] = useState(''), [statusFilter, setStatusFilter] = useState('')
   const [busy, setBusy] = useState(false), [notice, setNotice] = useState(''), [error, setError] = useState(''), [dragIndex, setDragIndex] = useState<number | null>(null)
   const report = (message: string, failed = false) => { setError(failed ? message : ''); setNotice(failed ? '' : message) }
-  const assertStaff = async () => { if (!supabase) return false; const { data } = await supabase.auth.getUser(); if (!data.user) return false; const { data: staff } = await supabase.from('staff_users').select('id').eq('user_id', data.user.id).eq('is_active', true).maybeSingle(); return Boolean(staff) }
+  const assertStaff = async () => { if (!supabase) return false; const { data } = await supabase.auth.getUser(); if (!data.user) return false; const { data: staff, error } = await supabase.rpc('is_staff'); return !error && staff === true }
   const load = async () => { if (!supabase) return; setBusy(true); const [p, c, b, o] = await Promise.all([
     supabase.from('products').select('id,name,description,category_id,price_cents,cost_cents,status,categories(name),product_variants(id,size,color,sku,stock,is_active),product_images(id,url,alt,sort_order)').order('created_at', { ascending: false }),
     supabase.from('categories').select('id,name').eq('is_active', true).order('name'),
