@@ -46,7 +46,9 @@ as $$
   );
 $$;
 
-create or replace view public.public_product_catalog as
+create or replace view public.public_product_catalog
+with (security_invoker = true)
+as
 select
   p.id,
   p.slug,

@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8"
+  },
+  "private": true,
+  "scripts": {
+    "test": "node test-database.mjs",
+    "favicons": "node generate-favicons.cjs"
+  }
+}

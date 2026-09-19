@@ -11,7 +11,11 @@ interface Product {
   category_name: string | null
   price_cents: number
   image_url: string | null
+  available: boolean
 }
+
+type PublicVariant = { id: string; product_id: string; size: string; color: string; available: boolean }
+type PublicBanner = { id: string; image_url: string; title: string | null; link_url: string | null }
 
 const formatPrice = (value: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value / 100)
@@ -19,6 +23,11 @@ const formatPrice = (value: number) =>
 export default function App() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
+  const [variants, setVariants] = useState<PublicVariant[]>([])
+  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({})
+  const [banners, setBanners] = useState<PublicBanner[]>([])
+  const [bannerIndex, setBannerIndex] = useState(0)
 
   const {
     items: cartItems,
@@ -34,61 +43,48 @@ export default function App() {
   } = useCart()
 
   useEffect(() => {
-    void (async () => {
-      if (supabase) {
-        try {
-          const { data } = await supabase
-            .from('public_product_catalog')
-            .select('*')
-            .order('name')
-          if (data && data.length > 0) {
-            setProducts(data as Product[])
-          }
-        } catch {
-          // fallback para demonstração
-        }
+    let cancelled = false
+    const load = async () => {
+      if (!supabase) {
+        setLoadError('A coleção está temporariamente indisponível.')
+        setLoading(false)
+        return
       }
-      setLoading(false)
-    })()
+      try {
+        const now = new Date().toISOString()
+        const [catalog, choices, promos] = await Promise.all([
+          supabase.from('public_product_catalog').select('*').order('name'),
+          supabase.rpc('catalog_public_variants'),
+          supabase.from('banners').select('id,image_url,title,link_url').eq('status', 'ativo')
+            .lte('starts_at', now).or('ends_at.is.null,ends_at.gte.' + now).order('sort_order'),
+        ])
+        if (catalog.error || choices.error) throw catalog.error || choices.error
+        if (!cancelled) {
+          setProducts(catalog.data ?? [])
+          setVariants(choices.data ?? [])
+          setBanners(promos.data ?? [])
+          setLoadError('')
+        }
+      } catch {
+        if (!cancelled) setLoadError('Não foi possível carregar a coleção. Tente novamente em instantes.')
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    void load()
+    const refresh = () => { void load() }
+    window.addEventListener('focus', refresh)
+    const timer = window.setInterval(refresh, 60000)
+    return () => { cancelled = true; window.removeEventListener('focus', refresh); window.clearInterval(timer) }
   }, [])
 
-  // Exibe produtos do banco ou peças demonstrativas da marca
-  const displayItems: Product[] = products.length
-    ? products
-    : [
-        {
-          id: 'demo-1',
-          name: 'Top Astral Terracota',
-          description: 'Sustentação precisa com toque acetinado e costas cruzadas.',
-          category_name: 'Top',
-          price_cents: 18900,
-          image_url: null,
-        },
-        {
-          id: 'demo-2',
-          name: 'Legging Essência Dourada',
-          description: 'Cintura alta anatômica, compressão inteligente sem transparência.',
-          category_name: 'Legging',
-          price_cents: 28900,
-          image_url: null,
-        },
-        {
-          id: 'demo-3',
-          name: 'Conjunto Movimento Puro',
-          description: 'Look completo em tecido tecnológico termorregulador.',
-          category_name: 'Conjunto',
-          price_cents: 42900,
-          image_url: null,
-        },
-        {
-          id: 'demo-4',
-          name: 'Faixa & Grip Studio',
-          description: 'Acessório de alta performance para treinos funcionais e pilates.',
-          category_name: 'Acessórios',
-          price_cents: 9900,
-          image_url: null,
-        },
-      ]
+  useEffect(() => {
+    if (banners.length < 2) return
+    const timer = window.setInterval(() => setBannerIndex(i => (i + 1) % banners.length), 6000)
+    return () => window.clearInterval(timer)
+  }, [banners.length])
+  const banner = banners[bannerIndex % banners.length]
+  const bannerLink = banner?.link_url && /^(https?:\/\/|\/(?!\/)|#)/i.test(banner.link_url) ? banner.link_url : undefined
 
   return (
     <main>
@@ -139,6 +135,14 @@ export default function App() {
         </div>
       </section>
 
+      {banner && (
+        <section className="promo-banner" aria-label="Promoções">
+          <a href={bannerLink}><img src={banner.image_url} alt={banner.title || 'Promoção Indómita'} /></a>
+          {banners.length > 1 && <div className="promo-controls">{banners.map((b, i) => (
+            <button key={b.id} type="button" aria-label={'Ver promoção ' + (i + 1)} aria-pressed={i === bannerIndex % banners.length} onClick={() => setBannerIndex(i)}>{i + 1}</button>
+          ))}</div>}
+        </section>
+      )}
       {/* Seção Novidades */}
       <section id="novidades" className="welcome">
         <h2>
@@ -165,8 +169,11 @@ export default function App() {
         <div className="products">
           {loading ? (
             <p>Carregando coleção...</p>
-          ) : (
-            displayItems.map((item, index) => (
+          ) : loadError ? <p role="alert">{loadError}</p> : !products.length ? <p>Novas peças chegam em breve.</p> : (
+            products.map((item, index) => {
+              const choices = variants.filter(v => v.product_id === item.id)
+              const selected = choices.find(v => v.id === selectedVariants[item.id]) || choices.find(v => v.available) || choices[0]
+              return (
               <article key={item.id} className="product-card">
                 <div className="product-image-container">
                   {item.image_url ? (
@@ -186,23 +193,30 @@ export default function App() {
                   <button
                     type="button"
                     className="quick-add-btn"
-                    onClick={() =>
+                    disabled={!item.available || !selected?.available}
+                    onClick={() => selected?.available &&
                       addItem({
+                        id: selected.id,
                         productId: item.id,
                         name: item.name,
                         categoryName: item.category_name,
-                        priceCents: item.price_cents > 0 ? item.price_cents : 18900,
+                        priceCents: item.price_cents,
                         imageUrl: item.image_url,
-                        size: 'M',
-                        color: 'Terracota',
+                        size: selected.size,
+                        color: selected.color,
                       })
                     }
                     aria-label={`Adicionar ${item.name} à sacola`}
                   >
-                    <span>+</span> Adicionar à sacola
+                    {item.available && selected?.available ? '+ Adicionar à sacola' : 'Indisponível'}
                   </button>
                 </div>
 
+                {choices.length > 1 && <label className="variant-choice">Tamanho / cor
+                  <select value={selected?.id || ''} onChange={e => setSelectedVariants(prev => ({ ...prev, [item.id]: e.target.value }))}>
+                    {choices.map(v => <option key={v.id} value={v.id} disabled={!v.available}>{v.size} / {v.color}{v.available ? '' : ' — indisponível'}</option>)}
+                  </select>
+                </label>}
                 <div className="product-info">
                   <div>
                     <h3>{item.name}</h3>
@@ -211,7 +225,7 @@ export default function App() {
                   {item.price_cents > 0 && <strong>{formatPrice(item.price_cents)}</strong>}
                 </div>
               </article>
-            ))
+            )})
           )}
         </div>
       </section>
